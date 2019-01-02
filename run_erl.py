@@ -182,7 +182,7 @@ class Agent:
 
 
 if __name__ == "__main__":
-    num_processes = 4
+    ray.init()
     parameters = Parameters()  # Create the Parameters class
     tracker = utils.Tracker(parameters, ['erl'], '_score.csv')  # Initiate tracker
     frame_tracker = utils.Tracker(parameters, ['frame_erl'], '_score.csv')  # Initiate tracker
