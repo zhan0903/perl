@@ -7,13 +7,21 @@ from core import ddpg as ddpg
 import argparse
 import torch.multiprocessing as mp
 import time
-import ray
+import ray, logging
 
 
 render = False
 parser = argparse.ArgumentParser()
 parser.add_argument('-env', help='Environment Choices: (HalfCheetah-v2) (Ant-v2) (Reacher-v2) (Walker2d-v2) (Swimmer-v2) (Hopper-v2)', required=True)
 env_tag = vars(parser.parse_args())['env']
+
+
+logger = logging.getLogger(__name__)
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+console_handler = logging.StreamHandler()
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+logger.setLevel(level=logging.DEBUG)
 
 
 class Parameters:
@@ -137,6 +145,7 @@ class Agent:
 
         # time_start = time.time()
         #Evaluate genomes/individuals
+        logger.debug("self.pop:{}".format(self.pop))
         all_fitness = ray.get([self.evaluate.remote(net.state_dict(), is_render=False, is_action_noise=False) for net in self.pop])
         print("results:{}".format(all_fitness))
 

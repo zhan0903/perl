@@ -4,6 +4,9 @@ from scipy.special import expit
 import fastrand, math
 
 
+
+
+
 #Neuroevolution SSNE
 class SSNE:
     def __init__(self, args):
