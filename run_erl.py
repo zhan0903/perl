@@ -103,6 +103,11 @@ class Agent:
         self.replay_buffer.push(state, action, next_state, reward, done)
 
     @ray.remote
+    def f(self, a):
+        time.sleep(1)
+        return a
+
+    @ray.remote
     def evaluate(self, net, is_render, is_action_noise=False, store_transition=True):
         total_reward = 0.0
 
@@ -144,7 +149,12 @@ class Agent:
         print("begin training")
 
         # time_start = time.time()
-        #Evaluate genomes/individuals
+        results = ray.get([self.f.remote(i) for i in range(4)])
+        print("results,", results)
+
+
+
+
         logger.debug("self.pop:{}".format(self.pop))
         all_fitness = ray.get([self.evaluate.remote(net.state_dict(), is_render=False, is_action_noise=False) for net in self.pop])
         print("results:{}".format(all_fitness))
@@ -189,10 +199,10 @@ class Agent:
 
         return best_train_fitness, test_score, elite_index
 
-@ray.remote
-def f(a):
-    time.sleep(1)
-    return a
+# @ray.remote
+# def f(a):
+#     time.sleep(1)
+#     return a
 
 
 if __name__ == "__main__":
@@ -207,8 +217,8 @@ if __name__ == "__main__":
     parameters.action_dim = env.action_space.shape[0]
     parameters.state_dim = env.observation_space.shape[0]
 
-    results = ray.get([f.remote(i) for i in range(4)])
-    print("results,", results)
+    # results = ray.get([f.remote(i) for i in range(4)])
+    # print("results,", results)
 
     #Seed
     env.seed(parameters.seed);
