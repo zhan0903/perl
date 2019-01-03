@@ -71,6 +71,11 @@ class Parameters:
         if not os.path.exists(self.save_foldername): os.makedirs(self.save_foldername)
 
 
+ @ray.remote
+def f(a):
+    time.sleep(1)
+    return a
+
 class Agent:
     def __init__(self, args, env):
         self.args = args; self.env = env
@@ -101,11 +106,11 @@ class Agent:
         action = utils.to_tensor(action)
         if self.args.is_cuda: action = action.cuda()
         self.replay_buffer.push(state, action, next_state, reward, done)
-
-    @ray.remote
-    def f(self, a):
-        time.sleep(1)
-        return a
+    #
+    # @ray.remote
+    # def f(a):
+    #     time.sleep(1)
+    #     return a
 
     @ray.remote
     def evaluate(self, net, is_render, is_action_noise=False, store_transition=True):
@@ -149,7 +154,7 @@ class Agent:
         print("begin training")
 
         # time_start = time.time()
-        results = ray.get([self.f.remote(i) for i in range(4)])
+        results = ray.get([f.remote(i) for i in range(4)])
         print("results,", results)
 
 
