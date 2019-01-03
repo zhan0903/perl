@@ -236,7 +236,7 @@ if __name__ == "__main__":
 
     next_save = 100; time_start = time.time()
 
-    all_fitness = ray.get([agent.evaluate.remote(net, is_render=False, is_action_noise=False) for net in agent.pop])
+    all_fitness = ray.get([agent.evaluate.remote(net, is_render=False, is_action_noise=False) for net in agent.remote.pop])
     print("results:{}".format(all_fitness))
 
     while agent.num_frames <= parameters.num_frames:
