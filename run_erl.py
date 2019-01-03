@@ -137,7 +137,7 @@ class Agent:
 
         # time_start = time.time()
         #Evaluate genomes/individuals
-        all_fitness = ray.get([self.evaluate.remote(net, is_render=False, is_action_noise=False) for net in self.pop])
+        all_fitness = ray.get([self.evaluate.remote(net.state_dict(), is_render=False, is_action_noise=False) for net in self.pop])
         print("results:{}".format(all_fitness))
 
         # for net in self.pop:
