@@ -71,7 +71,7 @@ class Parameters:
         if not os.path.exists(self.save_foldername): os.makedirs(self.save_foldername)
 
 
- @ray.remote
+@ray.remote
 def f(a):
     time.sleep(1)
     return a
