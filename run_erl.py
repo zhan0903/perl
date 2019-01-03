@@ -190,9 +190,9 @@ class Agent:
         return best_train_fitness, test_score, elite_index
 
 @ray.remote
-def f():
+def f(a):
     time.sleep(1)
-    return 1
+    return a
 
 
 if __name__ == "__main__":
@@ -207,7 +207,7 @@ if __name__ == "__main__":
     parameters.action_dim = env.action_space.shape[0]
     parameters.state_dim = env.observation_space.shape[0]
 
-    results = ray.get([f.remote() for i in range(4)])
+    results = ray.get([f.remote(i) for i in range(4)])
     print("results,", results)
 
     #Seed
