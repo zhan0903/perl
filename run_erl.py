@@ -189,6 +189,11 @@ class Agent:
 
         return best_train_fitness, test_score, elite_index
 
+@ray.remote
+def f():
+    time.sleep(1)
+    return 1
+
 
 if __name__ == "__main__":
     ray.init()
@@ -201,6 +206,9 @@ if __name__ == "__main__":
     env = utils.NormalizedActions(gym.make(env_tag))
     parameters.action_dim = env.action_space.shape[0]
     parameters.state_dim = env.observation_space.shape[0]
+
+    results = ray.get([f.remote() for i in range(4)])
+    print("results,", results)
 
     #Seed
     env.seed(parameters.seed);
