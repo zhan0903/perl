@@ -76,6 +76,8 @@ def f(a):
     time.sleep(1)
     return a
 
+
+@ray.remote
 class Agent:
     def __init__(self, args, env):
         self.args = args; self.env = env
@@ -112,7 +114,6 @@ class Agent:
     #     time.sleep(1)
     #     return a
 
-    @ray.remote
     def evaluate(self, net, is_render, is_action_noise=False, store_transition=True):
         total_reward = 0.0
 
