@@ -19,7 +19,6 @@ def hard_update(target, source):
 
 
 class Actor(nn.Module):
-
     def __init__(self, args, init=False):
         super(Actor, self).__init__()
         self.args = args

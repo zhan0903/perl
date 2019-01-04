@@ -205,11 +205,12 @@ class Agent:
 #     time.sleep(1)
 #     return a
 @ray.remote
-def evaluate(net, env):
+def evaluate(model, args, env):
     total_reward = 0.0
     num_frames = 0
     gen_frames = 0
-
+    net = ddpg.Actor(args)
+    net.load_state_dict(model)
 
     state = env.reset()
     state = utils.to_tensor(state).unsqueeze(0)
@@ -262,7 +263,7 @@ if __name__ == "__main__":
 
     next_save = 100; time_start = time.time()
 
-    all_fitness = ray.get([evaluate.remote(net, env) for net in agent.pop])
+    all_fitness = ray.get([evaluate.remote(net.state_dict(), parameters, env) for net in agent.pop])
     print("results:{}".format(all_fitness))
     exit(0)
 
