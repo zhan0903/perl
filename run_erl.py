@@ -266,6 +266,7 @@ if __name__ == "__main__":
 
     all_fitness = ray.get([evaluate.remote(net, env) for net in agent.pop])
     print("results:{}".format(all_fitness))
+    exit(0)
 
     while agent.num_frames <= parameters.num_frames:
         best_train_fitness, erl_score, elite_index = agent.train()
