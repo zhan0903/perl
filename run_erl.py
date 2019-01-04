@@ -76,8 +76,6 @@ def f(a):
     time.sleep(1)
     return a
 
-
-@ray.remote
 class Agent:
     def __init__(self, args, env):
         self.args = args; self.env = env
@@ -259,7 +257,7 @@ if __name__ == "__main__":
     torch.manual_seed(parameters.seed); np.random.seed(parameters.seed); random.seed(parameters.seed)
 
     #Create Agent
-    agent = Agent.remote(parameters, env)
+    agent = Agent(parameters, env)
     print('Running', env_tag, ' State_dim:', parameters.state_dim, ' Action_dim:', parameters.action_dim)
 
     next_save = 100; time_start = time.time()
