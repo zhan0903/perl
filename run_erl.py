@@ -158,9 +158,6 @@ class Agent:
         results = ray.get([f.remote(i) for i in range(4)])
         print("results,", results)
 
-
-
-
         logger.debug("self.pop:{}".format(self.pop))
         all_fitness = ray.get([self.evaluate.remote(net.state_dict(), is_render=False, is_action_noise=False) for net in self.pop])
         print("results:{}".format(all_fitness))
@@ -209,6 +206,37 @@ class Agent:
 # def f(a):
 #     time.sleep(1)
 #     return a
+@ray.remote
+def evaluate(net, env):
+    total_reward = 0.0
+    num_frames = 0
+    gen_frames = 0
+
+
+    state = env.reset()
+    state = utils.to_tensor(state).unsqueeze(0)
+    state = state.cuda()
+    done = False
+
+    while not done:
+        # if store_transition: num_frames += 1; gen_frames += 1
+        # if render and is_render: self.env.render()
+        action = net.forward(state)
+        action.clamp(-1, 1)
+        action = utils.to_numpy(action.cpu())
+        # if is_action_noise: action += self.ounoise.noise()
+
+        next_state, reward, done, info = env.step(action.flatten())  # Simulate one step in environment
+        next_state = utils.to_tensor(next_state).unsqueeze(0)
+        # if self.args.is_cuda:
+        next_state = next_state.cuda()
+        total_reward += reward
+
+        # if store_transition: self.add_experience(state, action, next_state, reward, done)
+        state = next_state
+    # if store_transition: self.num_games += 1
+
+    return total_reward
 
 
 if __name__ == "__main__":
@@ -236,7 +264,7 @@ if __name__ == "__main__":
 
     next_save = 100; time_start = time.time()
 
-    all_fitness = ray.get([agent.evaluate.remote(net, is_render=False, is_action_noise=False) for net in agent.pop])
+    all_fitness = ray.get([evaluate.remote(net, env) for net in agent.pop])
     print("results:{}".format(all_fitness))
 
     while agent.num_frames <= parameters.num_frames:
