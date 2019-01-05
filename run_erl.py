@@ -204,7 +204,8 @@ class Agent:
 # def f(a):
 #     time.sleep(1)
 #     return a
-@ray.remote(num_gpurs=2)
+
+@ray.remote(num_gpus=2)
 def evaluate(model, args, env):
     total_reward = 0.0
     num_frames = 0
