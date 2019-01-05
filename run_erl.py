@@ -206,13 +206,13 @@ class Agent:
 #     return a
 
 @ray.remote(num_gpus=2)
-def evaluate(model, args, env):
+def evaluate(net, args, env):
     total_reward = 0.0
     num_frames = 0
     gen_frames = 0
     # net = ddpg.Actor(args)
     # net.load_state_dict(model)
-    net = model
+    # net = model
 
     state = env.reset()
     state = utils.to_tensor(state).unsqueeze(0)
