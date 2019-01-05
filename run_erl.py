@@ -194,10 +194,8 @@ class Agent:
         print("net 0 ",self.pop[0])
 
         # all_fitness = ray.get([self.evaluate.remote(net, is_render=False, is_action_noise=False) for net in self.pop])
-        all_fitness = ray.get([evaluate.remote(net, parameters, env) for net in agent.pop])
+        all_fitness = ray.get([evaluate.remote(net, parameters, env) for net in self.pop])
         print("results:{}".format(all_fitness))
-        exit(0)
-
         # for net in self.pop:
         #     fitness = 0.0
         #     for eval in range(self.args.num_evals): fitness += self.evaluate(net, is_render=False, is_action_noise=False)
@@ -208,8 +206,12 @@ class Agent:
 
         #Validation test
         champ_index = all_fitness.index(max(all_fitness))
-        test_score = 0.0
-        for eval in range(5): test_score += self.evaluate(self.pop[champ_index], is_render=True, is_action_noise=False, store_transition=False)/5.0
+        # test_score = 0.0
+
+        test_scores = ray.get([evaluate.remote(self.pop[champ_index], parameters, env) for _ in range(5)])
+        test_score = sum(test_scores)/5.0
+
+        # %time for eval in range(5): test_score += self.evaluate(self.pop[champ_index], is_render=True, is_action_noise=False, store_transition=False)/5.0
 
         #NeuroEvolution's probabilistic selection and recombination step
         elite_index = self.evolver.epoch(self.pop, all_fitness)
