@@ -71,10 +71,40 @@ class Parameters:
         if not os.path.exists(self.save_foldername): os.makedirs(self.save_foldername)
 
 
-@ray.remote
-def f(a):
-    time.sleep(1)
-    return a
+@ray.remote(num_gpus=2)
+def evaluate(net, args, env):
+    total_reward = 0.0
+    num_frames = 0
+    gen_frames = 0
+    # net = ddpg.Actor(args)
+    # net.load_state_dict(model)
+    # net = model
+
+    state = env.reset()
+    state = utils.to_tensor(state).unsqueeze(0)
+    state = state.cuda()
+    done = False
+
+    while not done:
+        # if store_transition: num_frames += 1; gen_frames += 1
+        # if render and is_render: self.env.render()
+        action = net.forward(state)
+        action.clamp(-1, 1)
+        action = utils.to_numpy(action.cpu())
+        # if is_action_noise: action += self.ounoise.noise()
+
+        next_state, reward, done, info = env.step(action.flatten())  # Simulate one step in environment
+        next_state = utils.to_tensor(next_state).unsqueeze(0)
+        # if self.args.is_cuda:
+        next_state = next_state.cuda()
+        total_reward += reward
+
+        # if store_transition: self.add_experience(state, action, next_state, reward, done)
+        state = next_state
+    # if store_transition: self.num_games += 1
+
+    return total_reward
+
 
 class Agent:
     def __init__(self, args, env):
@@ -111,6 +141,8 @@ class Agent:
     # def f(a):
     #     time.sleep(1)
     #     return a
+
+
 
     @ray.remote(num_gpus=2)
     def evaluate(self, net, is_render, is_action_noise=False, store_transition=True):
@@ -159,8 +191,10 @@ class Agent:
 
         logger.debug("self.pop:{}".format(self.pop))
         # all_fitness = ray.get([self.evaluate.remote(net, parameters, env) for net in agent.pop])
+        print("net 0 ",self.pop[0])
 
-        all_fitness = ray.get([self.evaluate.remote(net, is_render=False, is_action_noise=False) for net in self.pop])
+        # all_fitness = ray.get([self.evaluate.remote(net, is_render=False, is_action_noise=False) for net in self.pop])
+        all_fitness = ray.get([evaluate.remote(net, parameters, env) for net in agent.pop])
         print("results:{}".format(all_fitness))
         exit(0)
 
