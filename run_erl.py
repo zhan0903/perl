@@ -204,7 +204,7 @@ class Agent:
 # def f(a):
 #     time.sleep(1)
 #     return a
-@ray.remote
+@ray.remote(num_gpurs=2)
 def evaluate(model, args, env):
     total_reward = 0.0
     num_frames = 0
@@ -239,7 +239,7 @@ def evaluate(model, args, env):
 
 
 if __name__ == "__main__":
-    ray.init()
+    ray.init(num_gpus=2)
     parameters = Parameters()  # Create the Parameters class
     tracker = utils.Tracker(parameters, ['erl'], '_score.csv')  # Initiate tracker
     frame_tracker = utils.Tracker(parameters, ['frame_erl'], '_score.csv')  # Initiate tracker
