@@ -112,6 +112,7 @@ class Agent:
     #     time.sleep(1)
     #     return a
 
+    @ray.remote(num_gpus=2)
     def evaluate(self, net, is_render, is_action_noise=False, store_transition=True):
         total_reward = 0.0
 
@@ -157,8 +158,11 @@ class Agent:
         print("results,", results)
 
         logger.debug("self.pop:{}".format(self.pop))
-        all_fitness = ray.get([self.evaluate.remote(net.state_dict(), is_render=False, is_action_noise=False) for net in self.pop])
+        # all_fitness = ray.get([self.evaluate.remote(net, parameters, env) for net in agent.pop])
+
+        all_fitness = ray.get([self.evaluate.remote(net, is_render=False, is_action_noise=False) for net in self.pop])
         print("results:{}".format(all_fitness))
+        exit(0)
 
         # for net in self.pop:
         #     fitness = 0.0
@@ -265,9 +269,9 @@ if __name__ == "__main__":
 
     next_save = 100; time_start = time.time()
 
-    all_fitness = ray.get([evaluate.remote(net, parameters, env) for net in agent.pop])
-    print("results:{}".format(all_fitness))
-    exit(0)
+    # all_fitness = ray.get([evaluate.remote(net, parameters, env) for net in agent.pop])
+    # print("results:{}".format(all_fitness))
+    # exit(0)
 
     while agent.num_frames <= parameters.num_frames:
         best_train_fitness, erl_score, elite_index = agent.train()
