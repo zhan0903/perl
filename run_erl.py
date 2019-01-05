@@ -185,11 +185,11 @@ class Agent:
         all_fitness = []
         print("begin training")
 
-        # time_start = time.time()
-        results = ray.get([f.remote(i) for i in range(4)])
-        print("results,", results)
+        # # time_start = time.time()
+        # results = ray.get([f.remote(i) for i in range(4)])
+        # print("results,", results)
 
-        logger.debug("self.pop:{}".format(self.pop))
+        # logger.debug("self.pop:{}".format(self.pop))
         # all_fitness = ray.get([self.evaluate.remote(net, parameters, env) for net in agent.pop])
         print("net 0 ",self.pop[0])
 
